@@ -4,6 +4,14 @@ Clone "Lightshot-like" portable per Windows: cattura area, annotazioni, salvatag
 
 **Stato:** Fasi 1-5 implementate (cattura, toolbar/salvataggio/stampa, OCR offline, annotazioni, impostazioni). Upload/condivisione online: non previsto (eventuale Fase 6).
 
+## Download
+
+**[⬇ Scarica PiCoShot.exe (ultima versione)](https://github.com/picoroma/PiCoShot/releases/latest/download/PiCoShot.exe)** · [tutte le versioni](https://github.com/picoroma/PiCoShot/releases)
+
+- Nessuna installazione: copia `PiCoShot.exe` in una cartella qualsiasi e avvialo. Compare nell'area di notifica (tray).
+- Requisiti: Windows 10 (1903+) o 11 x64; .NET Framework 4.8 è già incluso nel sistema.
+- L'exe non è firmato: al primo avvio SmartScreen può mostrare "PC protetto da Windows" → *Ulteriori informazioni* → *Esegui comunque*. In azienda AppLocker o altre policy potrebbero bloccarlo.
+
 ## Schermate
 
 **Selezione dell'area con la toolbar**: lo schermo viene congelato e oscurato, l'area scelta resta in chiaro con maniglie di ridimensionamento e dimensioni in pixel.
