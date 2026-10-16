@@ -4,6 +4,20 @@ Clone "Lightshot-like" portable per Windows: cattura area, annotazioni, salvatag
 
 **Stato:** Fasi 1-5 implementate (cattura, toolbar/salvataggio/stampa, OCR offline, annotazioni, impostazioni). Upload/condivisione online: non previsto (eventuale Fase 6).
 
+## Schermate
+
+**Selezione dell'area con la toolbar**: lo schermo viene congelato e oscurato, l'area scelta resta in chiaro con maniglie di ridimensionamento e dimensioni in pixel.
+
+![Selezione dell'area con toolbar](docs/screenshots/01-selezione.png)
+
+**Annotazioni al volo**: evidenziatore, riquadro, freccia e testo, inclusi nell'immagine copiata o salvata.
+
+![Annotazioni](docs/screenshots/02-annotazioni.png)
+
+**OCR offline** (`Ctrl+T` o pulsante OCR): il testo dell'area finisce negli appunti e una notifica ne mostra le prime righe.
+
+![Notifica OCR](docs/screenshots/03-ocr.png)
+
 ## Uso
 - `Stamp` (o `Ctrl+Shift+S` se Stamp è occupato) → overlay di selezione. `Ctrl+Stamp` → schermo intero già selezionato (quello sotto il cursore). Entrambe le hotkey si cambiano da Impostazioni (quella dello schermo intero si può disattivare).
 - Trascina per selezionare; maniglie per ridimensionare, trascina dentro per spostare.
