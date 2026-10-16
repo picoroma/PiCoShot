@@ -174,6 +174,7 @@ namespace PiCoShot
 
                 Settings.SaveFolder = dlg.SaveFolder;
                 Settings.DefaultColor = dlg.DefaultColor;
+                Settings.DefaultActions = dlg.DefaultActions;
                 if (!string.Equals(Settings.OcrLanguage, dlg.OcrLanguage, StringComparison.OrdinalIgnoreCase))
                 {
                     Settings.OcrLanguage = dlg.OcrLanguage;

@@ -74,7 +74,8 @@ namespace PiCoShot
         private Point _anchor;     // punto di inizio trascinamento
         private Rectangle _selAtDragStart;
         private Point _cursor;
-        private readonly SelectionToolbar _toolbar = new SelectionToolbar();   // azioni (copia, salva, ...)
+        private readonly SelectionToolbar _toolbar = new SelectionToolbar();   // barra sotto la selezione: colori, opzioni, azioni, OK/Annulla
+        private readonly SelectionToolbar _tools = new SelectionToolbar { Vertical = true };   // strumenti, in colonna a lato
 
         /// <summary>Messaggio da mostrare all'utente dopo la chiusura dell'overlay (titolo, testo, icona).</summary>
         public event Action<string, string, ToolTipIcon> Notify;
@@ -149,6 +150,7 @@ namespace PiCoShot
             _drag = Drag.None;
             DiscardText();
             _toolbar.Hide();
+            _tools.Hide();
             ResetAnnotations();
             DisposeBitmaps();
         }
@@ -160,24 +162,28 @@ namespace PiCoShot
             _tool = Tool.None;
         }
 
-        /// <summary>Ricalcola posizione/visibilità delle toolbar e ridisegna le zone interessate.</summary>
+        /// <summary>Ricalcola posizione/visibilità delle due barre e ridisegna le zone interessate.</summary>
         private void UpdateToolbar()
         {
-            Rectangle before = _toolbar.Bounds;
+            Rectangle before1 = _toolbar.Bounds, before2 = _tools.Bounds;
             bool show = !_sel.IsEmpty && _sel.Width >= MinSize && _sel.Height >= MinSize
                         && (_drag == Drag.None || _drag == Drag.Draw);
             if (show)
             {
                 using (Graphics g = CreateGraphics())
                 {
-                    _toolbar.Layout(g, _sel, WorkAreaOf(_sel));
+                    Rectangle wa = WorkAreaOf(_sel);
+                    _toolbar.Layout(g, _sel, wa);                       // sotto (o sopra/dentro)
+                    _tools.LayoutSide(g, _sel, wa, _toolbar.Bounds);    // a destra (o a sinistra/dentro)
                 }
             }
             else
             {
                 _toolbar.Hide();
+                _tools.Hide();
             }
-            InvalidateBar(before, _toolbar.Bounds);
+            InvalidateBar(before1, _toolbar.Bounds);
+            InvalidateBar(before2, _tools.Bounds);
         }
 
         private void InvalidateBar(Rectangle before, Rectangle after)
@@ -187,13 +193,13 @@ namespace PiCoShot
             if (!after.IsEmpty) Invalidate(Rectangle.Inflate(after, 2, 2));
         }
 
-        private bool OverBar(Point p) { return _toolbar.Contains(p); }
+        private bool OverBar(Point p) { return _toolbar.Contains(p) || _tools.Contains(p); }
 
         // ---------- strumenti di annotazione ----------
 
         private void BuildBar()
         {
-            // un'unica barra compatta: strumenti | colori | spessore | azioni
+            // colonna a lato: strumenti di annotazione
             AddToolButton(ToolIcons.Line, "Linea / sottolineatura (Maiusc = dritta)", Tool.Line);
             AddToolButton(ToolIcons.Arrow, "Freccia", Tool.Arrow);
             AddToolButton(ToolIcons.Rect, "Riquadro (Maiusc = quadrato)", Tool.Rect);
@@ -201,7 +207,8 @@ namespace PiCoShot
             AddToolButton(ToolIcons.Pen, "Penna libera (Maiusc = dritta)", Tool.Pen);
             AddToolButton(ToolIcons.Marker, "Evidenziatore dritto (Maiusc = a mano libera)", Tool.Marker);
             AddToolButton(ToolIcons.Text, "Testo (Invio conferma, Maiusc+Invio a capo)", Tool.Text);
-            _toolbar.AddSeparator();
+
+            // barra sotto: colori | spessore o opzioni testo | azioni | OK / Annulla
             foreach (Color c in Palette)
             {
                 Color captured = c;
@@ -231,17 +238,38 @@ namespace PiCoShot
             _toolbar.AddIcon(ToolIcons.Italic, "Corsivo", () => { _italic = !_italic; RefreshTools(); }, () => _italic, 28).VisibleWhen = textOn;
             _toolbar.AddIcon(ToolIcons.Label, "Etichetta: testo su sfondo colorato", () => { _boxed = !_boxed; RefreshTools(); }, () => _boxed, 28).VisibleWhen = textOn;
             _toolbar.AddSeparator();
-            _toolbar.AddIcon(ToolIcons.Copy, "Copia (Ctrl+C)", CopySelection);
-            _toolbar.AddIcon(ToolIcons.Ocr, "Copia testo - OCR (Ctrl+T)", CopyText, null, 38);
-            _toolbar.AddIcon(ToolIcons.Save, "Salva (Ctrl+S)", SaveDirect);
+
+            // azioni singole; quelle predefinite hanno il contrassegno verde
+            _toolbar.AddIcon(ToolIcons.Copy, "Copia (Ctrl+C)", CopySelection).Badge = () => IsDefault(DefaultAction.Copy);
+            _toolbar.AddIcon(ToolIcons.Ocr, "Copia testo - OCR (Ctrl+T)", CopyText, null, 38).Badge = () => IsDefault(DefaultAction.Ocr);
+            _toolbar.AddIcon(ToolIcons.Save, "Salva (Ctrl+S)", SaveDirect).Badge = () => IsDefault(DefaultAction.Save);
             _toolbar.AddIcon(ToolIcons.SaveAs, "Salva con nome (Ctrl+Shift+S)", SaveAs);
             _toolbar.AddIcon(ToolIcons.Print, "Stampa (Ctrl+P)", PrintSelection);
-            _toolbar.AddIcon(ToolIcons.Close, "Chiudi (Esc)", CloseOverlay);
+            _toolbar.AddSeparator();
+
+            // OK = azione predefinita, Annulla = chiude senza fare nulla
+            var ok = _toolbar.AddIcon(ToolIcons.Ok, null, RunDefaultActions, null, 40);
+            ok.TooltipFunc = () => "OK (Invio): " + DefaultActionsText();
+            _toolbar.AddIcon(ToolIcons.Cancel, "Annulla tutto (Esc)", CloseOverlay, null, 40);
+        }
+
+        private static bool IsDefault(DefaultAction a)
+        {
+            return (Settings.DefaultActions & a) != 0;
+        }
+
+        private static string DefaultActionsText()
+        {
+            var parts = new System.Collections.Generic.List<string>();
+            if (IsDefault(DefaultAction.Copy)) parts.Add("copia");
+            if (IsDefault(DefaultAction.Save)) parts.Add("salva");
+            if (IsDefault(DefaultAction.Ocr)) parts.Add("OCR su file");
+            return parts.Count == 0 ? "copia" : string.Join(" + ", parts.ToArray());
         }
 
         private void AddToolButton(Action<Graphics, Rectangle> icon, string tip, Tool tool)
         {
-            _toolbar.AddIcon(icon, tip, () => SelectTool(tool), () => _tool == tool);
+            _tools.AddIcon(icon, tip, () => SelectTool(tool), () => _tool == tool);
         }
 
         private static bool IsPaletteColor(Color c)
@@ -280,6 +308,7 @@ namespace PiCoShot
         private void RefreshTools()
         {
             if (_toolbar.Visible) Invalidate(Rectangle.Inflate(_toolbar.Bounds, 2, 2));
+            if (_tools.Visible) Invalidate(Rectangle.Inflate(_tools.Bounds, 2, 2));
         }
 
         private float CurrentWidth(Tool tool)
@@ -466,6 +495,81 @@ namespace PiCoShot
             Report(title, message, icon);
         }
 
+        /// <summary>
+        /// Pulsante OK (✔) / Invio: esegue le azioni predefinite delle Impostazioni (anche tutte insieme):
+        /// copia immagine, salva PNG, OCR accodato a PiCoShot_OCR.txt (testo anche negli appunti).
+        /// Con copia + OCR gli appunti contengono immagine e testo insieme.
+        /// </summary>
+        private async void RunDefaultActions()
+        {
+            if (!HasSelection || _ocrBusy) return;
+            _ocrBusy = true;
+            Cursor = Cursors.WaitCursor;
+            DefaultAction acts = Settings.DefaultActions == DefaultAction.None ? DefaultAction.Copy : Settings.DefaultActions;
+            var lines = new System.Collections.Generic.List<string>();
+            ToolTipIcon icon = ToolTipIcon.Info;
+            Bitmap image = null, original = null;
+            try
+            {
+                if ((acts & (DefaultAction.Copy | DefaultAction.Save)) != 0) image = Render(_sel);   // con annotazioni
+
+                if ((acts & DefaultAction.Save) != 0)
+                    lines.Add("Salvato: " + Output.SaveImage(image));
+
+                string text = null;
+                if ((acts & DefaultAction.Ocr) != 0)
+                {
+                    original = Crop(_sel);   // l'OCR lavora sull'immagine originale, senza annotazioni
+                    try
+                    {
+                        text = await OcrService.RecognizeAsync(original);
+                    }
+                    catch (OcrUnavailableException ex)
+                    {
+                        lines.Add(ex.Message);
+                        icon = ToolTipIcon.Warning;
+                    }
+                    if (string.IsNullOrWhiteSpace(text))
+                    {
+                        text = null;
+                        if (icon == ToolTipIcon.Info) { lines.Add("OCR: nessun testo riconosciuto."); icon = ToolTipIcon.Warning; }
+                    }
+                    else
+                    {
+                        string file = Output.AppendOcr(text);
+                        lines.Add("OCR accodato a: " + file);
+                        lines.Add(Preview(text));
+                    }
+                }
+
+                bool copyImage = (acts & DefaultAction.Copy) != 0;
+                if (copyImage || text != null)
+                {
+                    var data = new DataObject();
+                    if (copyImage) data.SetImage(image);
+                    if (text != null) data.SetText(text);
+                    Clipboard.SetDataObject(data, true);
+                    lines.Insert(0, "Negli appunti: " + (copyImage && text != null ? "immagine e testo" : copyImage ? "immagine" : "testo"));
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex);
+                lines.Add("Errore: " + ex.Message);
+                icon = ToolTipIcon.Error;
+            }
+            finally
+            {
+                if (image != null) image.Dispose();
+                if (original != null) original.Dispose();
+                _ocrBusy = false;
+            }
+            CloseOverlay();
+            string msg = string.Join("\n", lines.ToArray());
+            if (msg.Length > 250) msg = msg.Substring(0, 247) + "...";   // limite del fumetto di Windows
+            Report("PiCoShot", msg, icon);
+        }
+
         private static string Preview(string text)
         {
             string[] lines = text.Replace("\r", "").Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
@@ -633,6 +737,8 @@ namespace PiCoShot
                     CloseOverlay();
                     return true;
                 case Keys.Enter:
+                    RunDefaultActions();
+                    return true;
                 case Keys.Control | Keys.C:
                     CopySelection();
                     return true;
@@ -686,7 +792,7 @@ namespace PiCoShot
                 return;
             }
             if (e.Button != MouseButtons.Left) return;
-            if (_toolbar.Click(e.Location)) return;
+            if (_toolbar.Click(e.Location) || _tools.Click(e.Location)) return;
 
             if (CanDrawAt(e.Location))
             {
@@ -713,6 +819,7 @@ namespace PiCoShot
 
             bool overBar = OverBar(e.Location);
             if (_toolbar.MouseMove(e.Location)) Invalidate(_toolbar.TooltipArea);
+            if (_tools.MouseMove(e.Location)) Invalidate(_tools.TooltipArea);
             if (_drag == Drag.None && overBar)
             {
                 Cursor = Cursors.Default;
@@ -946,6 +1053,7 @@ namespace PiCoShot
                 if (!OverBar(_cursor) && _tool == Tool.None) DrawSizeLabel(g);
             }
             _toolbar.Paint(g);
+            _tools.Paint(g);
         }
 
         private void DrawSizeLabel(Graphics g)

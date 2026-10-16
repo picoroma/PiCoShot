@@ -19,6 +19,9 @@ namespace PiCoShot
         private readonly ComboBox _ocrBox = new ComboBox();
         private readonly Button _colorButton = new Button();
         private readonly CheckBox _autoStart = new CheckBox();
+        private readonly CheckBox _actCopy = new CheckBox();
+        private readonly CheckBox _actSave = new CheckBox();
+        private readonly CheckBox _actOcr = new CheckBox();
         private HotkeySpec _area, _full;
         private Color _color;
 
@@ -28,6 +31,17 @@ namespace PiCoShot
         public string OcrLanguage { get { var i = _ocrBox.SelectedItem as LangItem; return i == null ? "auto" : i.Tag; } }
         public Color DefaultColor { get { return _color; } }
         public bool AutoStart { get { return _autoStart.Checked; } }
+        public DefaultAction DefaultActions
+        {
+            get
+            {
+                DefaultAction a = DefaultAction.None;
+                if (_actCopy.Checked) a |= DefaultAction.Copy;
+                if (_actSave.Checked) a |= DefaultAction.Save;
+                if (_actOcr.Checked) a |= DefaultAction.Ocr;
+                return a;
+            }
+        }
 
         public SettingsForm()
         {
@@ -41,7 +55,7 @@ namespace PiCoShot
             MaximizeBox = MinimizeBox = false;
             ShowInTaskbar = false;
             Font = SystemFonts.MessageBoxFont;
-            ClientSize = new Size(440, 332);
+            ClientSize = new Size(440, 394);
 
             // --- hotkey ---
             var hotkeysGroup = new GroupBox { Text = "Hotkey (clicca nel campo e premi la combinazione)", Left = 12, Top = 8, Width = 416, Height = 108 };
@@ -89,19 +103,34 @@ namespace PiCoShot
                     if (dlg.ShowDialog(this) == DialogResult.OK) { _color = dlg.Color; _colorButton.Invalidate(); }
             };
 
+            // --- azione predefinita (pulsante OK ✔ e Invio) ---
+            var actGroup = new GroupBox { Text = "Azione predefinita del pulsante ✔ / Invio (anche più di una)", Left = 12, Top = 246, Width = 416, Height = 78 };
+            _actCopy.Text = "Copia immagine"; _actCopy.SetBounds(12, 22, 120, 22);
+            _actSave.Text = "Salva immagine"; _actSave.SetBounds(140, 22, 120, 22);
+            _actOcr.Text = "OCR su file"; _actOcr.SetBounds(270, 22, 130, 22);
+            _actCopy.Checked = (Settings.DefaultActions & DefaultAction.Copy) != 0;
+            _actSave.Checked = (Settings.DefaultActions & DefaultAction.Save) != 0;
+            _actOcr.Checked = (Settings.DefaultActions & DefaultAction.Ocr) != 0;
+            var actHint = new Label
+            {
+                Text = "OCR su file: il testo viene accodato a PiCoShot_OCR.txt nella cartella screenshot e copiato negli appunti.",
+                Left = 12, Top = 46, Width = 392, Height = 28, ForeColor = SystemColors.GrayText
+            };
+            actGroup.Controls.AddRange(new Control[] { _actCopy, _actSave, _actOcr, actHint });
+
             // --- avvio ---
             _autoStart.Text = "Avvia PiCoShot con Windows";
-            _autoStart.SetBounds(12, 250, 416, 24);
+            _autoStart.SetBounds(12, 332, 416, 24);
             _autoStart.Checked = Settings.AutoStart;
 
-            var ok = new Button { Text = "OK", Left = 272, Top = 292, Width = 75, DialogResult = DialogResult.OK };
-            var cancel = new Button { Text = "Annulla", Left = 353, Top = 292, Width = 75, DialogResult = DialogResult.Cancel };
+            var ok = new Button { Text = "OK", Left = 272, Top = 356, Width = 75, DialogResult = DialogResult.OK };
+            var cancel = new Button { Text = "Annulla", Left = 353, Top = 356, Width = 75, DialogResult = DialogResult.Cancel };
             AcceptButton = ok;
             CancelButton = cancel;
 
             Controls.AddRange(new Control[]
             {
-                hotkeysGroup, folderLabel, _folderBox, browse, ocrLabel, _ocrBox, colorLabel, _colorButton, _autoStart, ok, cancel
+                hotkeysGroup, folderLabel, _folderBox, browse, ocrLabel, _ocrBox, colorLabel, _colorButton, actGroup, _autoStart, ok, cancel
             });
             ActiveControl = _folderBox;
         }
@@ -163,6 +192,12 @@ namespace PiCoShot
         {
             if (DialogResult == DialogResult.OK)
             {
+                if (DefaultActions == DefaultAction.None)
+                {
+                    MessageBox.Show(this, "Seleziona almeno un'azione predefinita.", "PiCoShot", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    e.Cancel = true;
+                    return;
+                }
                 if (SaveFolder.Length == 0)
                 {
                     MessageBox.Show(this, "Indica una cartella di salvataggio.", "PiCoShot", MessageBoxButtons.OK, MessageBoxIcon.Warning);
