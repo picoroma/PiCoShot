@@ -7,6 +7,10 @@ using System.Windows.Forms;
 
 namespace PiCoShot
 {
+    /// <summary>Azioni eseguite dal pulsante OK (✔) / Invio; combinabili.</summary>
+    [Flags]
+    internal enum DefaultAction { None = 0, Copy = 1, Save = 2, Ocr = 4 }
+
     /// <summary>Hotkey = modificatori + tasto, serializzabile come "Ctrl+Shift+S" / "PrintScreen".</summary>
     internal struct HotkeySpec
     {
@@ -68,6 +72,7 @@ namespace PiCoShot
         // schermo intero: predefinita Ctrl+Stamp; Key == None = disattivata
         public static HotkeySpec HotkeyFullScreen = new HotkeySpec { Modifiers = HotkeySpec.MOD_CONTROL, Key = Keys.PrintScreen };
         public static string SaveFolder = DefaultSaveFolder;   // può contenere variabili d'ambiente
+        public static DefaultAction DefaultActions = DefaultAction.Copy;   // predefinita: copia (come prima di 0.2.0)
         public static bool AutoStart;                          // avvio con Windows
         public static string OcrLanguage = "auto";             // "auto" = lingue del profilo utente, oppure un tag (it, en-US, ...)
         public static Color DefaultColor = Color.FromArgb(255, 0, 0);   // colore iniziale delle annotazioni
@@ -94,6 +99,17 @@ namespace PiCoShot
                     if (HotkeySpec.TryParse(full, out spec)) HotkeyFullScreen = spec;
                     else HotkeyFullScreen = new HotkeySpec();   // vuota o "None": disattivata
                 }
+                string acts = Read("DefaultActions");
+                if (acts != null)
+                {
+                    DefaultAction parsed = DefaultAction.None;
+                    foreach (string part in acts.Split(new[] { ',', ';', '+', ' ' }, StringSplitOptions.RemoveEmptyEntries))
+                    {
+                        DefaultAction one;
+                        if (Enum.TryParse(part, true, out one) && one != DefaultAction.None) parsed |= one;
+                    }
+                    if (parsed != DefaultAction.None) DefaultActions = parsed;   // vuota/non valida: resta la copia
+                }
                 bool b;
                 if (bool.TryParse(Read("AutoStart"), out b)) AutoStart = b;
                 string lang = Read("OcrLanguage");
@@ -119,6 +135,7 @@ namespace PiCoShot
                 Write(lines, "Hotkey", Hotkey.ToString());
                 Write(lines, "HotkeyFullScreen", HotkeyFullScreen.IsValid ? HotkeyFullScreen.ToString() : "None");
                 Write(lines, "SaveFolder", SaveFolder);
+                Write(lines, "DefaultActions", DefaultActions.ToString().Replace(" ", ""));
                 Write(lines, "OcrLanguage", OcrLanguage);
                 Write(lines, "AutoStart", AutoStart ? "true" : "false");
                 Write(lines, "DefaultColor", "#" + (DefaultColor.ToArgb() & 0xFFFFFF).ToString("X6"));

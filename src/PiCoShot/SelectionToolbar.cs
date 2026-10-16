@@ -16,6 +16,8 @@ namespace PiCoShot
         {
             public string Text;
             public string Tooltip;
+            public Func<string> TooltipFunc;  // suggerimento dinamico (ha la precedenza su Tooltip)
+            public Func<bool> Badge;          // se vero: contrassegno verde (azione predefinita)
             public Action Action;
             public Func<bool> IsChecked;      // pulsante a due stati (strumento attivo, colore, spessore)
             public Func<Color> Swatch;        // se presente: campione di colore al posto del testo
@@ -37,6 +39,14 @@ namespace PiCoShot
 
         public Rectangle Bounds { get; private set; }
         public bool Visible { get; private set; }
+
+        /// <summary>Barra in colonna (strumenti a lato della selezione) invece che in riga.</summary>
+        public bool Vertical { get; set; }
+
+        private static string TipOf(Button b)
+        {
+            return b.TooltipFunc != null ? b.TooltipFunc() : b.Tooltip;
+        }
 
         public Button Add(string text, string tooltip, Action action, Func<bool> isChecked = null)
         {
@@ -75,13 +85,24 @@ namespace PiCoShot
 
         public string HoverTooltip
         {
-            get { return _hover >= 0 ? _buttons[_hover].Tooltip : null; }
+            get { return _hover >= 0 ? TipOf(_buttons[_hover]) : null; }
         }
 
         public void Hide() { Visible = false; _hover = -1; Bounds = Rectangle.Empty; }
 
         private Size Measure(Graphics g)
         {
+            if (Vertical)
+            {
+                int y = Pad;
+                foreach (Button b in _buttons)
+                {
+                    if (!b.Shown) { b.Bounds = Rectangle.Empty; continue; }
+                    b.Bounds = new Rectangle(Pad, y, 30, b.Separator ? 7 : 30);
+                    y += b.Bounds.Height + Gap;
+                }
+                return new Size(30 + Pad * 2, y - Gap + Pad);
+            }
             int x = Pad;
             foreach (Button b in _buttons)
             {
@@ -115,6 +136,23 @@ namespace PiCoShot
             if (top + size.Height > workArea.Bottom) top = sel.Top - size.Height - Margin;   // sopra
             if (top < workArea.Top) top = sel.Bottom - size.Height - Margin;                 // dentro, in basso
             Place(size, sel.Right - size.Width, top, workArea);
+        }
+
+        /// <summary>
+        /// Barra verticale a destra della selezione (altrimenti a sinistra, altrimenti dentro a destra).
+        /// <paramref name="avoid"/>: area (di un'altra barra) da non coprire.
+        /// </summary>
+        public void LayoutSide(Graphics g, Rectangle sel, Rectangle workArea, Rectangle avoid)
+        {
+            _area = workArea;
+            Size size = Measure(g);
+            int left = sel.Right + Margin;
+            if (left + size.Width > workArea.Right) left = sel.Left - size.Width - Margin;      // a sinistra
+            if (left < workArea.Left) left = sel.Right - size.Width - Margin;                   // dentro, a destra
+            int top = sel.Top;
+            if (!avoid.IsEmpty && new Rectangle(left, top, size.Width, size.Height).IntersectsWith(avoid))
+                top = avoid.Top - size.Height - Gap - 2;                                        // sopra l'altra barra
+            Place(size, left, top, workArea);
         }
 
         /// <summary>Posiziona una seconda barra accanto alla prima, sul lato opposto alla selezione se possibile.</summary>
@@ -190,11 +228,15 @@ namespace PiCoShot
                 if (b.Separator)
                 {
                     using (var sep = new Pen(Color.FromArgb(110, 255, 255, 255)))
-                        g.DrawLine(sep, b.Bounds.X + b.Bounds.Width / 2, b.Bounds.Y + 3, b.Bounds.X + b.Bounds.Width / 2, b.Bounds.Bottom - 3);
+                    {
+                        if (Vertical) g.DrawLine(sep, b.Bounds.X + 4, b.Bounds.Y + b.Bounds.Height / 2, b.Bounds.Right - 4, b.Bounds.Y + b.Bounds.Height / 2);
+                        else g.DrawLine(sep, b.Bounds.X + b.Bounds.Width / 2, b.Bounds.Y + 3, b.Bounds.X + b.Bounds.Width / 2, b.Bounds.Bottom - 3);
+                    }
                     continue;
                 }
 
                 bool on = b.IsChecked != null && b.IsChecked();
+                bool badge = b.Badge != null && b.Badge();
                 if (i == _hover || on)
                     using (var path = RoundRect(b.Bounds, 4))
                     using (var hl = new SolidBrush(i == _hover ? Color.FromArgb(0, 120, 215) : Color.FromArgb(85, 85, 85)))
@@ -223,6 +265,22 @@ namespace PiCoShot
                         TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
                 }
             }
+            for (int i = 0; i < _buttons.Count; i++)
+            {
+                Button b = _buttons[i];
+                if (!b.Shown || b.Separator || b.Badge == null || !b.Badge()) continue;
+                // azione predefinita: bordo e pallino verdi
+                using (var path = RoundRect(b.Bounds, 4))
+                using (var ring = new Pen(Color.FromArgb(46, 204, 113), 1.6f))
+                    g.DrawPath(ring, path);
+                var dot = new Rectangle(b.Bounds.Right - 9, b.Bounds.Top + 1, 8, 8);
+                using (var fill = new SolidBrush(Color.FromArgb(46, 204, 113)))
+                using (var edge = new Pen(Color.FromArgb(32, 32, 32), 1.5f))
+                {
+                    g.FillEllipse(fill, dot);
+                    g.DrawEllipse(edge, dot);
+                }
+            }
             PaintTooltip(g);
             g.SmoothingMode = old;
         }
@@ -230,17 +288,28 @@ namespace PiCoShot
         /// <summary>Area (oltre alla barra) in cui può comparire il suggerimento: da ridisegnare al cambio di hover.</summary>
         public Rectangle TooltipArea
         {
-            get { return Bounds.IsEmpty ? Bounds : Rectangle.Inflate(Bounds, 160, 34); }
+            get { return Bounds.IsEmpty ? Bounds : (Vertical ? Rectangle.Inflate(Bounds, 230, 10) : Rectangle.Inflate(Bounds, 160, 34)); }
         }
 
         private void PaintTooltip(Graphics g)
         {
-            if (_hover < 0 || string.IsNullOrEmpty(_buttons[_hover].Tooltip)) return;
+            if (_hover < 0 || string.IsNullOrEmpty(TipOf(_buttons[_hover]))) return;
             Button b = _buttons[_hover];
-            Size ts = TextRenderer.MeasureText(g, b.Tooltip, _font);
-            var box = new Rectangle(b.Bounds.X + b.Bounds.Width / 2 - (ts.Width + 12) / 2, Bounds.Bottom + 4, ts.Width + 12, ts.Height + 6);
-            if (box.Bottom > _area.Bottom) box.Y = Bounds.Top - box.Height - 4;
-            box.X = Math.Max(_area.Left + 2, Math.Min(_area.Right - box.Width - 2, box.X));
+            string tip = TipOf(b);
+            Size ts = TextRenderer.MeasureText(g, tip, _font);
+            Rectangle box;
+            if (Vertical)
+            {
+                // colonna: suggerimento di lato (a sinistra della barra, altrimenti a destra)
+                box = new Rectangle(Bounds.Left - ts.Width - 16, b.Bounds.Y + (b.Bounds.Height - ts.Height - 6) / 2, ts.Width + 12, ts.Height + 6);
+                if (box.Left < _area.Left + 2) box.X = Bounds.Right + 4;
+            }
+            else
+            {
+                box = new Rectangle(b.Bounds.X + b.Bounds.Width / 2 - (ts.Width + 12) / 2, Bounds.Bottom + 4, ts.Width + 12, ts.Height + 6);
+                if (box.Bottom > _area.Bottom) box.Y = Bounds.Top - box.Height - 4;
+                box.X = Math.Max(_area.Left + 2, Math.Min(_area.Right - box.Width - 2, box.X));
+            }
             using (var path = RoundRect(box, 4))
             using (var bg = new SolidBrush(Color.FromArgb(240, 20, 20, 20)))
             using (var edge = new Pen(Color.FromArgb(90, 255, 255, 255)))
@@ -248,7 +317,7 @@ namespace PiCoShot
                 g.FillPath(bg, path);
                 g.DrawPath(edge, path);
             }
-            TextRenderer.DrawText(g, b.Tooltip, _font, box, Color.White,
+            TextRenderer.DrawText(g, tip, _font, box, Color.White,
                 TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
         }
 

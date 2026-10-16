@@ -166,7 +166,7 @@ DefaultColor=#FF0000
 - File ini, hotkey configurabile, avvio con Windows (chiave `HKCU\...\Run`, solo se attivato dall'utente), finestra Impostazioni minimale, icona applicazione.
 - **Accettazione:** copiando l'exe su un altro PC e avviandolo, funziona senza altri passaggi.
 
-### Release 0.2.0 — in cantiere
+### Release 0.2.0 — realizzata (vedi CHANGELOG.md)
 
 > Riferimento grafico: Lightshot (✔/✖ vicino alla selezione; strumenti in colonna a destra, azioni in barra sotto).
 
@@ -179,6 +179,7 @@ DefaultColor=#FF0000
 - **Le azioni predefinite sono evidenziate nella barra**: i pulsanti Copia, Salva e OCR attivi nelle Impostazioni hanno un contrassegno ben visibile (pallino verde in alto a destra del pulsante e bordo colorato), così si capisce a colpo d'occhio cosa farà ✔. Il suggerimento al passaggio del mouse su ✔ elenca le azioni ("OK: copia + salva + OCR").
 - `Invio` esegue la stessa azione predefinita (oggi: solo copia). Nessuna azione selezionata → ✔ non compare.
 - Le azioni attuali della toolbar (Copia, Salva, OCR, ...) restano disponibili come singoli pulsanti.
+- Realizzato: con nessuna azione valida nell'ini si usa la copia; nel pannello Impostazioni ne serve almeno una.
 - Appunti con Copia **e** OCR attivi: un unico contenuto con due formati, immagine **e** testo (si incolla l'immagine in Paint/Teams, il testo in Blocco note). Con la sola OCR negli appunti va il testo.
 - Con più azioni: ordine Copia → Salva → OCR; una sola notifica finale riepilogativa (cosa è stato copiato/salvato, percorso del file, prime righe dell'OCR).
 - **Punto aperto**: se OCR è l'unica azione e non trova testo → notifica "Nessun testo riconosciuto", niente scrittura nel file.

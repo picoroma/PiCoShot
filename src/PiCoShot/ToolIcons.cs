@@ -156,6 +156,31 @@ namespace PiCoShot
             }
         }
 
+        /// <summary>Pulsante OK: riquadro verde con spunta bianca.</summary>
+        public static void Ok(Graphics g, Rectangle r)
+        {
+            var box = Rectangle.Inflate(r, -1, -1);
+            using (var br = new SolidBrush(Color.FromArgb(46, 160, 67))) g.FillRectangle(br, box);
+            using (Pen p = P(3f))
+            {
+                int cx = box.X + box.Width / 2, cy = box.Y + box.Height / 2;
+                g.DrawLines(p, new[] { new Point(cx - 8, cy), new Point(cx - 2, cy + 6), new Point(cx + 9, cy - 6) });
+            }
+        }
+
+        /// <summary>Pulsante Annulla: riquadro rosso con croce bianca.</summary>
+        public static void Cancel(Graphics g, Rectangle r)
+        {
+            var box = Rectangle.Inflate(r, -1, -1);
+            using (var br = new SolidBrush(Color.FromArgb(200, 55, 55))) g.FillRectangle(br, box);
+            using (Pen p = P(3f))
+            {
+                int cx = box.X + box.Width / 2, cy = box.Y + box.Height / 2;
+                g.DrawLine(p, cx - 6, cy - 6, cx + 6, cy + 6);
+                g.DrawLine(p, cx + 6, cy - 6, cx - 6, cy + 6);
+            }
+        }
+
         public static void Close(Graphics g, Rectangle r)
         {
             Rectangle b = Box(r);
