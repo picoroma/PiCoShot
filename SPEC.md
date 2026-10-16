@@ -166,6 +166,29 @@ DefaultColor=#FF0000
 - File ini, hotkey configurabile, avvio con Windows (chiave `HKCU\...\Run`, solo se attivato dall'utente), finestra Impostazioni minimale, icona applicazione.
 - **Accettazione:** copiando l'exe su un altro PC e avviandolo, funziona senza altri passaggi.
 
+### Release 0.2.0 — in cantiere
+
+> Riferimento grafico: Lightshot (✔/✖ vicino alla selezione; strumenti in colonna a destra, azioni in barra sotto).
+
+#### F1 — Azione predefinita ("OK ✔")
+- Accanto alla selezione (angolo in basso a destra) compaiono due pulsanti grandi: **✔ OK** e **✖ Annulla**. **OK** esegue l'azione predefinita; ✖ equivale a Esc.
+- L'azione predefinita è **una, due o tutte e tre** queste, scelte nelle Impostazioni (caselle di controllo, ini: `DefaultActions=Copy,Save,Ocr`):
+  - **Copia** l'immagine (con annotazioni) negli appunti;
+  - **Salva immagine su file**: PNG nella cartella delle Impostazioni;
+  - **OCR su file**: il testo riconosciuto viene **accodato** a un file di testo locale `PiCoShot_OCR.txt` nella cartella screenshot (UTF-8, ogni voce preceduta da data/ora) **e** copiato negli appunti. Il file ha un limite di **10 GB**: se la voce successiva lo superasse, si continua in un nuovo file numerato (`PiCoShot_OCR_2.txt`, ...) con avviso nella notifica.
+- **Le azioni predefinite sono evidenziate nella barra**: i pulsanti Copia, Salva e OCR attivi nelle Impostazioni hanno un contrassegno ben visibile (pallino verde in alto a destra del pulsante e bordo colorato), così si capisce a colpo d'occhio cosa farà ✔. Il suggerimento al passaggio del mouse su ✔ elenca le azioni ("OK: copia + salva + OCR").
+- `Invio` esegue la stessa azione predefinita (oggi: solo copia). Nessuna azione selezionata → ✔ non compare.
+- Le azioni attuali della toolbar (Copia, Salva, OCR, ...) restano disponibili come singoli pulsanti.
+- Appunti con Copia **e** OCR attivi: un unico contenuto con due formati, immagine **e** testo (si incolla l'immagine in Paint/Teams, il testo in Blocco note). Con la sola OCR negli appunti va il testo.
+- Con più azioni: ordine Copia → Salva → OCR; una sola notifica finale riepilogativa (cosa è stato copiato/salvato, percorso del file, prime righe dell'OCR).
+- **Punto aperto**: se OCR è l'unica azione e non trova testo → notifica "Nessun testo riconosciuto", niente scrittura nel file.
+
+#### F2 — Opzioni distribuite su due lati
+- Strumenti di annotazione (linea, freccia, riquadro, cerchio, penna, evidenziatore, testo) **in colonna verticale** sul lato destro della selezione; colori, spessori/opzioni testo e azioni (copia, OCR, salva, salva con nome, stampa, chiudi) in **barra orizzontale** sotto.
+- Se a destra non c'è spazio: lato sinistro, altrimenti dentro la selezione. La barra inferiore segue le regole attuali (sotto → sopra → dentro).
+- Le due barre non si sovrappongono né coprono i pulsanti ✔/✖ di F1; tutto resta nell'area dello schermo della selezione.
+- **Accettazione:** a selezione piccola, a bordo schermo e su monitor secondario tutti i pulsanti restano visibili e raggiungibili.
+
 ---
 
 ## 8. Build e distribuzione
