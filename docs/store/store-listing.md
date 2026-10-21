@@ -4,11 +4,11 @@
 
 ## Checklist di invio
 
-- [ ] Account sviluppatore: <https://storedeveloper.microsoft.com> → "Get started" → Individual developer (gratuito) → ID + selfie
-- [ ] Nome "PiCoShot" riservato in Partner Center (Apps and games → New product → MSIX or PWA app)
+- [x] Account sviluppatore: <https://storedeveloper.microsoft.com> → "Get started" → Individual developer (gratuito) → ID + selfie
+- [x] Nome "PiCoShot" riservato in Partner Center (Apps and games → New product → MSIX or PWA app)
 - [ ] `Identity Name`, `Publisher` e `Publisher display name` copiati da Product management → Product identity
 - [ ] Pacchetto: `.\build.ps1` poi `.\packaging\msix\build-msix.ps1 -IdentityName ".." -Publisher "CN=.." -PublisherDisplayName ".."`
-- [ ] Privacy policy pubblicata a un URL pubblico (`docs/store/privacy-policy.md`)
+- [x] Privacy policy pubblicata: https://picoroma.github.io/PiCoShot/privacy/
 - [ ] Schermate nuove (almeno 1, consigliate 4; 16:9, 1366×768 o più)
 - [ ] Questionario classificazione per età
 - [ ] Giustificazione `runFullTrust` (testo sotto)
@@ -20,8 +20,8 @@
 - **Categoria:** Utilità e strumenti (Utilities & tools)
 - **Prezzo:** Gratuita
 - **Lingue della scheda:** italiano (+ inglese consigliato)
-- **Sito / supporto:** [URL o email di supporto]
-- **URL informativa privacy:** [URL pubblico della privacy policy]
+- **Sito / supporto:** https://picoroma.github.io/PiCoShot/ · picodev@cocco.biz
+- **URL informativa privacy:** https://picoroma.github.io/PiCoShot/privacy/
 
 ## Italiano
 

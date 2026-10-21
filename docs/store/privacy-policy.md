@@ -1,14 +1,14 @@
 # Informativa sulla privacy di PiCoShot / PiCoShot Privacy Policy
 
-*Bozza da pubblicare a un URL pubblico (richiesto da Partner Center, policy Microsoft Store 10.5.1). Sostituisci i segnaposto tra parentesi quadre prima della pubblicazione.*
+*Versione pubblicata: https://picoroma.github.io/PiCoShot/privacy/ (sorgente HTML in `docs/privacy/index.html`; tieni allineati i due file).*
 
 ---
 
 ## Italiano
 
-**Ultimo aggiornamento:** [data]
-**Titolare / sviluppatore:** [nome o ragione sociale]
-**Contatto:** [indirizzo email di contatto]
+**Ultimo aggiornamento:** 21 ottobre 2026
+**Sviluppatore:** PiCoDev
+**Contatto:** picodev@cocco.biz
 
 ### In sintesi
 PiCoShot **non raccoglie, non trasmette e non condivide alcun dato personale**. L'app non si connette a internet, non ha account, non contiene pubblicità né strumenti di telemetria o analisi.
@@ -34,15 +34,15 @@ L'app non è rivolta ai minori e non raccoglie dati di alcuna persona, minori co
 Se in futuro l'app dovesse trattare dati in modo diverso (per esempio con funzioni online), questa informativa verrà aggiornata prima del rilascio di quelle funzioni.
 
 ### Contatti
-Per domande: [indirizzo email di contatto].
+Per domande: picodev@cocco.biz.
 
 ---
 
 ## English
 
-**Last updated:** [date]
-**Developer:** [name or company]
-**Contact:** [contact email]
+**Last updated:** October 21, 2026
+**Developer:** PiCoDev
+**Contact:** picodev@cocco.biz
 
 ### Summary
 PiCoShot **does not collect, transmit or share any personal data**. The app does not connect to the internet, has no accounts, no ads and no telemetry or analytics.
@@ -68,4 +68,4 @@ The app is not directed to children and collects no data from anyone, including 
 If the app ever handles data differently (for example with online features), this policy will be updated before those features are released.
 
 ### Contact
-Questions: [contact email].
+Questions: picodev@cocco.biz.
