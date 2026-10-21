@@ -4,6 +4,7 @@
 
 ### Novità
 - **Interfaccia in italiano e inglese.** Di default segue la lingua di Windows (italiano se è italiano, altrimenti inglese). Si cambia da Impostazioni → *Lingua dell'app* (o `Language=auto|it|en` nell'ini) e vale dal riavvio successivo. Il motto nell'About resta in italiano.
+- **ZIP portable** allegato alla release (`PiCoShot-portable-x64.zip` con exe, licenza e istruzioni IT/EN, più il checksum SHA-256).
 - **Nuove icona e immagine About**, con una nuova frase.
 - **Versione Microsoft Store (pacchetto MSIX)**: l'avvio con Windows usa l'API di avvio dei pacchetti; il pacchetto dichiara italiano e inglese.
 
