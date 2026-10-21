@@ -65,3 +65,6 @@ Output: `dist\PiCoShot.exe`. Con l'SDK: `dotnet build src\PiCoShot\PiCoShot.cspr
 .\packaging\msix\build-msix.ps1 -IdentityName "<da Partner Center>" -Publisher "CN=<da Partner Center>" -PublisherDisplayName "<nome>"
 ```
 Output: `dist\PiCoShot_<versione>_x64.msix` (la versione viene da `Properties\AssemblyInfo.cs`). Bozze di privacy policy e testi della scheda: [docs/store](docs/store).
+
+## Licenza
+Il codice sorgente è rilasciato con licenza **GNU General Public License v3.0**: vedi [LICENSE](LICENSE). L'icona e le immagini in `src/PiCoShot/Resources` sono escluse dalla licenza e non vanno riutilizzate senza permesso.
