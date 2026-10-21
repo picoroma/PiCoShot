@@ -21,10 +21,19 @@ namespace PiCoShot
     /// <summary>Wrapper asincrono su Windows.Media.Ocr (motore integrato in Windows, nessuna rete).</summary>
     internal static class OcrService
     {
-        private const string MissingLanguageMessage =
-            "Nessuna lingua OCR installata.\n" +
-            "Aggiungi la funzionalità OCR da Impostazioni → Ora e lingua → Lingua e area geografica → " +
-            "(lingua) → Opzioni linguistiche → Riconoscimento del testo (OCR).";
+        private static string MissingLanguageMessage
+        {
+            get
+            {
+                return L.T(
+                    "Nessuna lingua OCR installata.\n" +
+                    "Aggiungi la funzionalità OCR da Impostazioni → Ora e lingua → Lingua e area geografica → " +
+                    "(lingua) → Opzioni linguistiche → Riconoscimento del testo (OCR).",
+                    "No OCR language installed.\n" +
+                    "Add the OCR feature from Settings → Time & language → Language & region → " +
+                    "(language) → Language options → Optical character recognition (OCR).");
+            }
+        }
 
         private static OcrEngine _engine;
         private static string _engineFor;   // valore di Settings.OcrLanguage con cui è stato creato _engine

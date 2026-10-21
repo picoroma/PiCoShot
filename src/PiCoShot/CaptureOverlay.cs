@@ -200,32 +200,32 @@ namespace PiCoShot
         private void BuildBar()
         {
             // colonna a lato: strumenti di annotazione
-            AddToolButton(ToolIcons.Line, "Linea / sottolineatura (Maiusc = dritta)", Tool.Line);
-            AddToolButton(ToolIcons.Arrow, "Freccia", Tool.Arrow);
-            AddToolButton(ToolIcons.Rect, "Riquadro (Maiusc = quadrato)", Tool.Rect);
-            AddToolButton(ToolIcons.Ellipse, "Cerchio / ellisse (Maiusc = cerchio)", Tool.Ellipse);
-            AddToolButton(ToolIcons.Pen, "Penna libera (Maiusc = dritta)", Tool.Pen);
-            AddToolButton(ToolIcons.Marker, "Evidenziatore dritto (Maiusc = a mano libera)", Tool.Marker);
-            AddToolButton(ToolIcons.Text, "Testo (Invio conferma, Maiusc+Invio a capo)", Tool.Text);
+            AddToolButton(ToolIcons.Line, L.T("Linea / sottolineatura (Maiusc = dritta)", "Line / underline (Shift = straight)"), Tool.Line);
+            AddToolButton(ToolIcons.Arrow, L.T("Freccia", "Arrow"), Tool.Arrow);
+            AddToolButton(ToolIcons.Rect, L.T("Riquadro (Maiusc = quadrato)", "Rectangle (Shift = square)"), Tool.Rect);
+            AddToolButton(ToolIcons.Ellipse, L.T("Cerchio / ellisse (Maiusc = cerchio)", "Circle / ellipse (Shift = circle)"), Tool.Ellipse);
+            AddToolButton(ToolIcons.Pen, L.T("Penna libera (Maiusc = dritta)", "Freehand pen (Shift = straight)"), Tool.Pen);
+            AddToolButton(ToolIcons.Marker, L.T("Evidenziatore dritto (Maiusc = a mano libera)", "Straight highlighter (Shift = freehand)"), Tool.Marker);
+            AddToolButton(ToolIcons.Text, L.T("Testo (Invio conferma, Maiusc+Invio a capo)", "Text (Enter confirms, Shift+Enter for a new line)"), Tool.Text);
 
             // barra sotto: colori | spessore o opzioni testo | azioni | OK / Annulla
             foreach (Color c in Palette)
             {
                 Color captured = c;
-                _toolbar.AddSwatch(() => captured, "Colore", () => SetColor(captured), () => _color.ToArgb() == captured.ToArgb());
+                _toolbar.AddSwatch(() => captured, L.T("Colore", "Color"), () => SetColor(captured), () => _color.ToArgb() == captured.ToArgb());
             }
-            _toolbar.AddSwatch(() => IsPaletteColor(_color) ? Color.FromArgb(120, 120, 120) : _color, "Altro colore...",
+            _toolbar.AddSwatch(() => IsPaletteColor(_color) ? Color.FromArgb(120, 120, 120) : _color, L.T("Altro colore...", "More colors..."),
                 PickCustomColor, () => !IsPaletteColor(_color));
             _toolbar.AddSeparator();
             for (int i = 0; i < PenWidths.Length; i++)
             {
                 int idx = i;
-                _toolbar.AddLineWidth(PenWidths[i], "Spessore", () => { _thick = idx; RefreshTools(); }, () => _thick == idx)
+                _toolbar.AddLineWidth(PenWidths[i], L.T("Spessore", "Thickness"), () => { _thick = idx; RefreshTools(); }, () => _thick == idx)
                     .VisibleWhen = () => _tool != Tool.Text;
             }
             // opzioni del testo: compaiono al posto degli spessori quando lo strumento Testo è attivo
             Func<bool> textOn = () => _tool == Tool.Text;
-            string[] sizeNames = { "Testo piccolo", "Testo medio", "Testo grande", "Testo molto grande" };
+            string[] sizeNames = { L.T("Testo piccolo", "Small text"), L.T("Testo medio", "Medium text"), L.T("Testo grande", "Large text"), L.T("Testo molto grande", "Very large text") };
             int[] glyph = { 9, 12, 15, 18 };
             for (int i = 0; i < TextSizes.Length; i++)
             {
@@ -234,23 +234,23 @@ namespace PiCoShot
                     .VisibleWhen = textOn;
             }
             _toolbar.AddSeparator().VisibleWhen = textOn;
-            _toolbar.AddIcon(ToolIcons.Bold, "Grassetto", () => { _bold = !_bold; RefreshTools(); }, () => _bold, 28).VisibleWhen = textOn;
-            _toolbar.AddIcon(ToolIcons.Italic, "Corsivo", () => { _italic = !_italic; RefreshTools(); }, () => _italic, 28).VisibleWhen = textOn;
-            _toolbar.AddIcon(ToolIcons.Label, "Etichetta: testo su sfondo colorato", () => { _boxed = !_boxed; RefreshTools(); }, () => _boxed, 28).VisibleWhen = textOn;
+            _toolbar.AddIcon(ToolIcons.Bold, L.T("Grassetto", "Bold"), () => { _bold = !_bold; RefreshTools(); }, () => _bold, 28).VisibleWhen = textOn;
+            _toolbar.AddIcon(ToolIcons.Italic, L.T("Corsivo", "Italic"), () => { _italic = !_italic; RefreshTools(); }, () => _italic, 28).VisibleWhen = textOn;
+            _toolbar.AddIcon(ToolIcons.Label, L.T("Etichetta: testo su sfondo colorato", "Label: text on a colored background"), () => { _boxed = !_boxed; RefreshTools(); }, () => _boxed, 28).VisibleWhen = textOn;
             _toolbar.AddSeparator();
 
             // azioni singole; quelle predefinite hanno il contrassegno verde
-            _toolbar.AddIcon(ToolIcons.Copy, "Copia (Ctrl+C)", CopySelection).Badge = () => IsDefault(DefaultAction.Copy);
-            _toolbar.AddIcon(ToolIcons.Ocr, "Copia testo - OCR (Ctrl+T)", CopyText, null, 38).Badge = () => IsDefault(DefaultAction.Ocr);
-            _toolbar.AddIcon(ToolIcons.Save, "Salva (Ctrl+S)", SaveDirect).Badge = () => IsDefault(DefaultAction.Save);
-            _toolbar.AddIcon(ToolIcons.SaveAs, "Salva con nome (Ctrl+Shift+S)", SaveAs);
-            _toolbar.AddIcon(ToolIcons.Print, "Stampa (Ctrl+P)", PrintSelection);
+            _toolbar.AddIcon(ToolIcons.Copy, L.T("Copia (Ctrl+C)", "Copy (Ctrl+C)"), CopySelection).Badge = () => IsDefault(DefaultAction.Copy);
+            _toolbar.AddIcon(ToolIcons.Ocr, L.T("Copia testo - OCR (Ctrl+T)", "Copy text - OCR (Ctrl+T)"), CopyText, null, 38).Badge = () => IsDefault(DefaultAction.Ocr);
+            _toolbar.AddIcon(ToolIcons.Save, L.T("Salva (Ctrl+S)", "Save (Ctrl+S)"), SaveDirect).Badge = () => IsDefault(DefaultAction.Save);
+            _toolbar.AddIcon(ToolIcons.SaveAs, L.T("Salva con nome (Ctrl+Shift+S)", "Save as (Ctrl+Shift+S)"), SaveAs);
+            _toolbar.AddIcon(ToolIcons.Print, L.T("Stampa (Ctrl+P)", "Print (Ctrl+P)"), PrintSelection);
             _toolbar.AddSeparator();
 
             // OK = azione predefinita, Annulla = chiude senza fare nulla
             var ok = _toolbar.AddIcon(ToolIcons.Ok, null, RunDefaultActions, null, 40);
-            ok.TooltipFunc = () => "OK (Invio): " + DefaultActionsText();
-            _toolbar.AddIcon(ToolIcons.Cancel, "Annulla tutto (Esc)", CloseOverlay, null, 40);
+            ok.TooltipFunc = () => L.T("OK (Invio): ", "OK (Enter): ") + DefaultActionsText();
+            _toolbar.AddIcon(ToolIcons.Cancel, L.T("Annulla tutto (Esc)", "Cancel everything (Esc)"), CloseOverlay, null, 40);
         }
 
         private static bool IsDefault(DefaultAction a)
@@ -261,10 +261,10 @@ namespace PiCoShot
         private static string DefaultActionsText()
         {
             var parts = new System.Collections.Generic.List<string>();
-            if (IsDefault(DefaultAction.Copy)) parts.Add("copia");
-            if (IsDefault(DefaultAction.Save)) parts.Add("salva");
-            if (IsDefault(DefaultAction.Ocr)) parts.Add("OCR su file");
-            return parts.Count == 0 ? "copia" : string.Join(" + ", parts.ToArray());
+            if (IsDefault(DefaultAction.Copy)) parts.Add(L.T("copia", "copy"));
+            if (IsDefault(DefaultAction.Save)) parts.Add(L.T("salva", "save"));
+            if (IsDefault(DefaultAction.Ocr)) parts.Add(L.T("OCR su file", "OCR to file"));
+            return parts.Count == 0 ? L.T("copia", "copy") : string.Join(" + ", parts.ToArray());
         }
 
         private void AddToolButton(Action<Graphics, Rectangle> icon, string tip, Tool tool)
@@ -466,13 +466,13 @@ namespace PiCoShot
                 string text = await OcrService.RecognizeAsync(crop);
                 if (string.IsNullOrWhiteSpace(text))
                 {
-                    message = "Nessun testo riconosciuto nell'area selezionata.";
+                    message = L.T("Nessun testo riconosciuto nell'area selezionata.", "No text recognized in the selected area.");
                     icon = ToolTipIcon.Warning;
                 }
                 else
                 {
                     Clipboard.SetText(text);
-                    message = "Testo copiato:\n" + Preview(text);
+                    message = L.T("Testo copiato:\n", "Text copied:\n") + Preview(text);
                 }
             }
             catch (OcrUnavailableException ex)
@@ -483,7 +483,7 @@ namespace PiCoShot
             catch (Exception ex)
             {
                 Log.Error(ex);
-                message = "OCR non riuscito: " + ex.Message;
+                message = L.T("OCR non riuscito: ", "OCR failed: ") + ex.Message;
                 icon = ToolTipIcon.Error;
             }
             finally
@@ -514,7 +514,7 @@ namespace PiCoShot
                 if ((acts & (DefaultAction.Copy | DefaultAction.Save)) != 0) image = Render(_sel);   // con annotazioni
 
                 if ((acts & DefaultAction.Save) != 0)
-                    lines.Add("Salvato: " + Output.SaveImage(image));
+                    lines.Add(L.T("Salvato: ", "Saved: ") + Output.SaveImage(image));
 
                 string text = null;
                 if ((acts & DefaultAction.Ocr) != 0)
@@ -532,12 +532,12 @@ namespace PiCoShot
                     if (string.IsNullOrWhiteSpace(text))
                     {
                         text = null;
-                        if (icon == ToolTipIcon.Info) { lines.Add("OCR: nessun testo riconosciuto."); icon = ToolTipIcon.Warning; }
+                        if (icon == ToolTipIcon.Info) { lines.Add(L.T("OCR: nessun testo riconosciuto.", "OCR: no text recognized.")); icon = ToolTipIcon.Warning; }
                     }
                     else
                     {
                         string file = Output.AppendOcr(text);
-                        lines.Add("OCR accodato a: " + file);
+                        lines.Add(L.T("OCR accodato a: ", "OCR appended to: ") + file);
                         lines.Add(Preview(text));
                     }
                 }
@@ -549,13 +549,13 @@ namespace PiCoShot
                     if (copyImage) data.SetImage(image);
                     if (text != null) data.SetText(text);
                     Clipboard.SetDataObject(data, true);
-                    lines.Insert(0, "Negli appunti: " + (copyImage && text != null ? "immagine e testo" : copyImage ? "immagine" : "testo"));
+                    lines.Insert(0, L.T("Negli appunti: ", "On the clipboard: ") + (copyImage && text != null ? L.T("immagine e testo", "image and text") : copyImage ? L.T("immagine", "image") : L.T("testo", "text")));
                 }
             }
             catch (Exception ex)
             {
                 Log.Error(ex);
-                lines.Add("Errore: " + ex.Message);
+                lines.Add(L.T("Errore: ", "Error: ") + ex.Message);
                 icon = ToolTipIcon.Error;
             }
             finally
@@ -605,13 +605,13 @@ namespace PiCoShot
                 using (Bitmap crop = Render(_sel))
                     crop.Save(path, ImageFormat.Png);
                 CloseOverlay();
-                Report("PiCoShot", "Salvato: " + path, ToolTipIcon.Info);
+                Report("PiCoShot", L.T("Salvato: ", "Saved: ") + path, ToolTipIcon.Info);
             }
             catch (Exception ex)
             {
                 Log.Error(ex);
                 CloseOverlay();
-                Report("PiCoShot", "Salvataggio non riuscito: " + ex.Message, ToolTipIcon.Error);
+                Report("PiCoShot", L.T("Salvataggio non riuscito: ", "Saving failed: ") + ex.Message, ToolTipIcon.Error);
             }
         }
 
@@ -625,7 +625,7 @@ namespace PiCoShot
                 Directory.CreateDirectory(folder);
                 using (var dlg = new SaveFileDialog())
                 {
-                    dlg.Title = "Salva con nome";
+                    dlg.Title = L.T("Salva con nome", "Save as");
                     dlg.InitialDirectory = folder;
                     dlg.FileName = "PiCoShot_" + DateTime.Now.ToString("yyyyMMdd_HHmmss");
                     dlg.Filter = "PNG (*.png)|*.png|JPEG (*.jpg)|*.jpg|Bitmap (*.bmp)|*.bmp";
@@ -643,14 +643,14 @@ namespace PiCoShot
                         crop.Save(dlg.FileName, fmt);
                     string saved = dlg.FileName;
                     CloseOverlay();
-                    Report("PiCoShot", "Salvato: " + saved, ToolTipIcon.Info);
+                    Report("PiCoShot", L.T("Salvato: ", "Saved: ") + saved, ToolTipIcon.Info);
                 }
             }
             catch (Exception ex)
             {
                 Log.Error(ex);
                 CloseOverlay();
-                Report("PiCoShot", "Salvataggio non riuscito: " + ex.Message, ToolTipIcon.Error);
+                Report("PiCoShot", L.T("Salvataggio non riuscito: ", "Saving failed: ") + ex.Message, ToolTipIcon.Error);
             }
         }
 
@@ -681,7 +681,7 @@ namespace PiCoShot
             catch (Exception ex)
             {
                 Log.Error(ex);
-                Report("PiCoShot", "Stampa non riuscita: " + ex.Message, ToolTipIcon.Error);
+                Report("PiCoShot", L.T("Stampa non riuscita: ", "Printing failed: ") + ex.Message, ToolTipIcon.Error);
             }
             finally
             {

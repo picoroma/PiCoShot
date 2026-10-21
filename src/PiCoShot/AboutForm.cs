@@ -12,7 +12,7 @@ namespace PiCoShot
 
         public AboutForm()
         {
-            Text = "Informazioni su PiCoShot";
+            Text = L.T("Informazioni su PiCoShot", "About PiCoShot");
             FormBorderStyle = FormBorderStyle.FixedDialog;
             StartPosition = FormStartPosition.CenterScreen;
             MaximizeBox = MinimizeBox = false;
@@ -48,14 +48,14 @@ namespace PiCoShot
             };
             var text = new Label
             {
-                Text = "Cattura rapida di un'area dello schermo, annotazioni al volo,\n" +
-                       "salvataggio, stampa e OCR offline del testo catturato.\n\n" +
-                       "Portable: un solo file, nessuna installazione.\n" +
-                       "Nessuna connessione di rete, nessuna telemetria.",
+                Text = L.T("Cattura rapida di un'area dello schermo, annotazioni al volo,\n", "Quick capture of a screen area, on-the-fly annotations,\n") +
+                       L.T("salvataggio, stampa e OCR offline del testo catturato.\n\n", "saving, printing and offline OCR of the captured text.\n\n") +
+                       L.T("Portable: un solo file, nessuna installazione.\n", "Portable: a single file, no installation.\n") +
+                       L.T("Nessuna connessione di rete, nessuna telemetria.", "No network connection, no telemetry."),
                 Left = 10, Top = 466, Width = 360, Height = 100,
                 TextAlign = ContentAlignment.TopCenter
             };
-            var ok = new Button { Text = "Chiudi", Left = 150, Top = 572, Width = 80, DialogResult = DialogResult.OK };
+            var ok = new Button { Text = L.T("Chiudi", "Close"), Left = 150, Top = 572, Width = 80, DialogResult = DialogResult.OK };
             AcceptButton = ok;
             CancelButton = ok;
 

@@ -74,6 +74,7 @@ namespace PiCoShot
         public static string SaveFolder = DefaultSaveFolder;   // può contenere variabili d'ambiente
         public static DefaultAction DefaultActions = DefaultAction.Copy;   // predefinita: copia (come prima di 0.2.0)
         public static bool AutoStart;                          // avvio con Windows
+        public static string Language = "auto";                // lingua dell'interfaccia: "auto" (come Windows), "it" o "en"
         public static string OcrLanguage = "auto";             // "auto" = lingue del profilo utente, oppure un tag (it, en-US, ...)
         public static Color DefaultColor = Color.FromArgb(255, 0, 0);   // colore iniziale delle annotazioni
 
@@ -119,6 +120,8 @@ namespace PiCoShot
                 {
                     try { DefaultColor = ColorTranslator.FromHtml(col); } catch { }
                 }
+                string ui = Read("Language");
+                if (!string.IsNullOrWhiteSpace(ui)) Language = ui.Trim();
                 string folder = Read("SaveFolder");
                 if (!string.IsNullOrWhiteSpace(folder)) SaveFolder = folder;
             }
@@ -136,6 +139,7 @@ namespace PiCoShot
                 Write(lines, "HotkeyFullScreen", HotkeyFullScreen.IsValid ? HotkeyFullScreen.ToString() : "None");
                 Write(lines, "SaveFolder", SaveFolder);
                 Write(lines, "DefaultActions", DefaultActions.ToString().Replace(" ", ""));
+                Write(lines, "Language", Language);
                 Write(lines, "OcrLanguage", OcrLanguage);
                 Write(lines, "AutoStart", AutoStart ? "true" : "false");
                 Write(lines, "DefaultColor", "#" + (DefaultColor.ToArgb() & 0xFFFFFF).ToString("X6"));

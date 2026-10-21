@@ -76,7 +76,7 @@ namespace PiCoShot
             {
                 using (RegistryKey k = Registry.CurrentUser.CreateSubKey(RunKey))
                 {
-                    if (k == null) { LastError = "Registro non scrivibile."; return false; }
+                    if (k == null) { LastError = L.T("Registro non scrivibile.", "Registry not writable."); return false; }
                     if (enabled) k.SetValue(ValueName, "\"" + Application.ExecutablePath + "\"");
                     else if (k.GetValue(ValueName) != null) k.DeleteValue(ValueName, false);
                 }
@@ -85,7 +85,7 @@ namespace PiCoShot
             catch (Exception ex)
             {
                 Log.Error(ex);
-                LastError = "Impossibile modificare l'avvio con Windows (registro non scrivibile).";
+                LastError = L.T("Impossibile modificare l'avvio con Windows (registro non scrivibile).", "Unable to change Start with Windows (registry not writable).");
                 return false;
             }
         }
@@ -126,16 +126,16 @@ namespace PiCoShot
                 if (state == StartupTaskState.Enabled || state == StartupTaskState.EnabledByPolicy) return true;
 
                 LastError = state == StartupTaskState.DisabledByUser
-                    ? "L'avvio è stato disattivato da te in Windows: riattivalo da Impostazioni > App > Avvio."
+                    ? L.T("L'avvio è stato disattivato da te in Windows: riattivalo da Impostazioni > App > Avvio.", "Start was turned off by you in Windows: turn it back on in Settings > Apps > Startup.")
                     : state == StartupTaskState.DisabledByPolicy
-                        ? "L'avvio automatico è bloccato dai criteri del sistema."
-                        : "Impossibile attivare l'avvio con Windows.";
+                        ? L.T("L'avvio automatico è bloccato dai criteri del sistema.", "Automatic start is blocked by system policy.")
+                        : L.T("Impossibile attivare l'avvio con Windows.", "Unable to enable Start with Windows.");
                 return false;
             }
             catch (Exception ex)
             {
                 Log.Error(ex);
-                LastError = "Impossibile modificare l'avvio con Windows.";
+                LastError = L.T("Impossibile modificare l'avvio con Windows.", "Unable to change Start with Windows.");
                 return false;
             }
         }

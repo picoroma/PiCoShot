@@ -14,6 +14,8 @@ namespace PiCoShot
             {
                 if (!createdNew)
                 {
+                    Settings.Load();
+                    L.Init(Settings.Language);
                     TrayApp.NotifyAlreadyRunning();
                     return;
                 }
@@ -24,6 +26,7 @@ namespace PiCoShot
                 AppDomain.CurrentDomain.UnhandledException += (s, e) => Log.Error(e.ExceptionObject as Exception);
 
                 Settings.Load();
+                L.Init(Settings.Language);
                 Application.Run(new TrayApp());
             }
         }

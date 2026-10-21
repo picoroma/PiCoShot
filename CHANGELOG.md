@@ -1,5 +1,11 @@
 # Change log
 
+## In sviluppo (prossima versione)
+
+### Novità
+- **Interfaccia in italiano e inglese.** Di default segue la lingua di Windows (italiano se è italiano, altrimenti inglese). Si cambia da Impostazioni → *Lingua dell'app* (o `Language=auto|it|en` nell'ini) e vale dal riavvio successivo. Il motto nell'About resta in italiano.
+- Il pacchetto MSIX dichiara anche `en-US`, così lo Store può mostrare la scheda in inglese.
+
 ## 0.2.0
 
 ### Novità

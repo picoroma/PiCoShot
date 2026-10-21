@@ -29,16 +29,16 @@ namespace PiCoShot
             _overlay.Notify += (title, text, icon) => _tray.ShowBalloonTip(3000, title, text, icon);
 
             var menu = new ContextMenuStrip();
-            menu.Items.Add("Cattura area", null, (s, e) => Capture(false));
-            menu.Items.Add("Cattura schermo intero", null, (s, e) => Capture(true));
+            menu.Items.Add(L.T("Cattura area", "Capture area"), null, (s, e) => Capture(false));
+            menu.Items.Add(L.T("Cattura schermo intero", "Capture full screen"), null, (s, e) => Capture(true));
             menu.Items.Add(new ToolStripSeparator());
-            menu.Items.Add("Impostazioni...", null, (s, e) => OpenSettings());
-            _autoItem = new ToolStripMenuItem("Avvio con Windows") { CheckOnClick = true };
+            menu.Items.Add(L.T("Impostazioni...", "Settings..."), null, (s, e) => OpenSettings());
+            _autoItem = new ToolStripMenuItem(L.T("Avvio con Windows", "Start with Windows")) { CheckOnClick = true };
             _autoItem.Click += (s, e) => SetAutoStart(_autoItem.Checked);
             menu.Items.Add(_autoItem);
-            menu.Items.Add("Informazioni su PiCoShot...", null, (s, e) => { using (var f = new AboutForm()) f.ShowDialog(); });
+            menu.Items.Add(L.T("Informazioni su PiCoShot...", "About PiCoShot..."), null, (s, e) => { using (var f = new AboutForm()) f.ShowDialog(); });
             menu.Items.Add(new ToolStripSeparator());
-            menu.Items.Add("Esci", null, (s, e) => ExitApp());
+            menu.Items.Add(L.T("Esci", "Exit"), null, (s, e) => ExitApp());
 
             _tray = new NotifyIcon
             {
@@ -77,7 +77,7 @@ namespace PiCoShot
             }
             else
             {
-                _tray.ShowBalloonTip(6000, "PiCoShot", Startup.LastError ?? "Impossibile modificare l'avvio con Windows.", ToolTipIcon.Warning);
+                _tray.ShowBalloonTip(6000, "PiCoShot", Startup.LastError ?? L.T("Impossibile modificare l'avvio con Windows.", "Unable to change Start with Windows."), ToolTipIcon.Warning);
             }
             _autoItem.Checked = Startup.IsEnabled;
         }
@@ -90,20 +90,21 @@ namespace PiCoShot
             else
             {
                 string hint = hk.Key == Keys.PrintScreen
-                    ? "\nPer liberare Stamp: Impostazioni → Accessibilità → Tastiera → disattiva \"Usa il tasto Stamp per aprire la cattura schermo\"."
+                    ? L.T("\nPer liberare Stamp: Impostazioni → Accessibilità → Tastiera → disattiva \"Usa il tasto Stamp per aprire la cattura schermo\".",
+                        "\nTo free the Print Screen key: Settings → Accessibility → Keyboard → turn off \"Use the Print screen button to open screen capture\".")
                     : "";
                 var fallback = new HotkeySpec { Modifiers = MOD_CONTROL | MOD_SHIFT, Key = Keys.S };
                 if (hk.ToString() != fallback.ToString() && _hotkey.Register(AreaId, fallback.Modifiers, fallback.Key))
                 {
                     _currentArea = fallback;
                     _tray.ShowBalloonTip(6000, "PiCoShot",
-                        hk + " è occupato da un altro programma. Uso " + fallback + " (cambiala da Impostazioni)." + hint,
+                        hk + L.T(" è occupato da un altro programma. Uso ", " is in use by another program. Using ") + fallback + L.T(" (cambiala da Impostazioni).", " (change it in Settings).") + hint,
                         ToolTipIcon.Warning);
                 }
                 else
                 {
                     _tray.ShowBalloonTip(8000, "PiCoShot",
-                        "Impossibile registrare " + hk + ". Scegline un'altra da Impostazioni oppure cattura dal menu dell'icona." + hint,
+                        L.T("Impossibile registrare ", "Unable to register ") + hk + L.T(". Scegline un'altra da Impostazioni oppure cattura dal menu dell'icona.", ". Choose another one in Settings or capture from the tray icon menu.") + hint,
                         ToolTipIcon.Error);
                 }
             }
@@ -114,7 +115,7 @@ namespace PiCoShot
             if (full.ToString() == _currentArea.ToString() || !_hotkey.Register(FullScreenId, full.Modifiers, full.Key))
             {
                 _tray.ShowBalloonTip(6000, "PiCoShot",
-                    "Hotkey schermo intero (" + full + ") non disponibile: è già usata. Cambiala da Impostazioni.",
+                    L.T("Hotkey schermo intero (", "Full-screen hotkey (") + full + L.T(") non disponibile: è già usata. Cambiala da Impostazioni.", ") is unavailable: it is already in use. Change it in Settings."),
                     ToolTipIcon.Warning);
                 return;
             }
@@ -132,7 +133,7 @@ namespace PiCoShot
 
                 if (area.IsValid && full.IsValid && area.ToString() == full.ToString())
                 {
-                    problems.AppendLine("Le due hotkey devono essere diverse: schermo intero non modificata.");
+                    problems.AppendLine(L.T("Le due hotkey devono essere diverse: schermo intero non modificata.", "The two hotkeys must be different: the full-screen hotkey was not changed."));
                     full = Settings.HotkeyFullScreen;
                 }
 
@@ -147,7 +148,7 @@ namespace PiCoShot
                     else
                     {
                         if (_currentArea.IsValid) _hotkey.Register(AreaId, _currentArea.Modifiers, _currentArea.Key);
-                        problems.AppendLine(area + " è già usata da un altro programma: la hotkey area resta " + _currentArea + ".");
+                        problems.AppendLine(area + L.T(" è già usata da un altro programma: la hotkey area resta ", " is already used by another program: the area hotkey stays ") + _currentArea + ".");
                     }
                 }
 
@@ -168,11 +169,13 @@ namespace PiCoShot
                     else
                     {
                         if (_currentFull.IsValid) _hotkey.Register(FullScreenId, _currentFull.Modifiers, _currentFull.Key);
-                        problems.AppendLine(full + " è già usata da un altro programma: la hotkey schermo intero resta " +
-                                            (_currentFull.IsValid ? _currentFull.ToString() : "disattivata") + ".");
+                        problems.AppendLine(full + L.T(" è già usata da un altro programma: la hotkey schermo intero resta ", " is already used by another program: the full-screen hotkey stays ") +
+                                            (_currentFull.IsValid ? _currentFull.ToString() : L.T("disattivata", "disabled")) + ".");
                     }
                 }
 
+                bool languageChanged = !string.Equals(Settings.Language, dlg.Language, StringComparison.OrdinalIgnoreCase);
+                Settings.Language = dlg.Language;
                 Settings.SaveFolder = dlg.SaveFolder;
                 Settings.DefaultColor = dlg.DefaultColor;
                 Settings.DefaultActions = dlg.DefaultActions;
@@ -184,10 +187,13 @@ namespace PiCoShot
                 if (dlg.AutoStart != Startup.IsEnabled || dlg.AutoStart != Settings.AutoStart)
                 {
                     if (Startup.Set(dlg.AutoStart)) Settings.AutoStart = dlg.AutoStart;
-                    else problems.AppendLine(Startup.LastError ?? "Impossibile modificare l'avvio con Windows.");
+                    else problems.AppendLine(Startup.LastError ?? L.T("Impossibile modificare l'avvio con Windows.", "Unable to change Start with Windows."));
                 }
                 _autoItem.Checked = Startup.IsEnabled;
                 Settings.Save();
+
+                if (languageChanged)
+                    _tray.ShowBalloonTip(5000, "PiCoShot", L.T("La nuova lingua sarà applicata al prossimo avvio di PiCoShot.", "The new language will be applied the next time PiCoShot starts."), ToolTipIcon.Info);
 
                 if (problems.Length > 0)
                     MessageBox.Show(problems.ToString().TrimEnd(), "PiCoShot", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -231,7 +237,7 @@ namespace PiCoShot
         {
             using (var ni = new NotifyIcon { Icon = BuildIcon(), Visible = true })
             {
-                ni.ShowBalloonTip(3000, "PiCoShot", "PiCoShot è già in esecuzione", ToolTipIcon.Info);
+                ni.ShowBalloonTip(3000, "PiCoShot", L.T("PiCoShot è già in esecuzione", "PiCoShot is already running"), ToolTipIcon.Info);
                 var sw = Stopwatch.StartNew();
                 while (sw.ElapsedMilliseconds < 3000)
                 {
