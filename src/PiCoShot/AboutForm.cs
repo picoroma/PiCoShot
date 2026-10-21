@@ -30,8 +30,9 @@ namespace PiCoShot
             // citazione sotto la foto: corsivo, centrata
             var quote = new Label
             {
-                Text = "Oh, gioveni! Quando vi dico sequitemi miei pugnaci, dovete sequire et pugnare! " +
-                       "Poche conte! Se no qui stemo a prenderci per le natiche.",
+                Text = "O prodi! Qui si cattura lo schermo come falchi affamati! " +
+                       "Quando vi dico 'screenshot' voi percutete et salvate! " +
+                       "Poche chiacchiere! Se no stemo a grattarci le terga!",
                 Font = new Font(Font.FontFamily, 10f, FontStyle.Italic),
                 Left = 10, Top = 358, Width = 360, Height = 64,
                 TextAlign = ContentAlignment.MiddleCenter
