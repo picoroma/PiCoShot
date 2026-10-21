@@ -54,7 +54,14 @@ DefaultColor=#FF0000
 ```
 
 ## Build
+Senza .NET SDK (usa il compilatore C# già presente in Windows e il Windows SDK per l'OCR):
 ```
-dotnet build src\PiCoShot\PiCoShot.csproj -c Release
+.\build.ps1
 ```
-Output: `src\PiCoShot\bin\Release\net48\PiCoShot.exe`.
+Output: `dist\PiCoShot.exe`. Con l'SDK: `dotnet build src\PiCoShot\PiCoShot.csproj -c Release`.
+
+### Pacchetto MSIX (Microsoft Store)
+```
+.\packaging\msix\build-msix.ps1 -IdentityName "<da Partner Center>" -Publisher "CN=<da Partner Center>" -PublisherDisplayName "<nome>"
+```
+Output: `dist\PiCoShot_<versione>_x64.msix` (la versione viene da `Properties\AssemblyInfo.cs`). Bozze di privacy policy e testi della scheda: [docs/store](docs/store).

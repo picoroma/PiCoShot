@@ -121,7 +121,7 @@ namespace PiCoShot
             // --- avvio ---
             _autoStart.Text = "Avvia PiCoShot con Windows";
             _autoStart.SetBounds(12, 332, 416, 24);
-            _autoStart.Checked = Settings.AutoStart;
+            _autoStart.Checked = Startup.IsEnabled;   // stato reale (registro o StartupTask)
 
             var ok = new Button { Text = "OK", Left = 272, Top = 356, Width = 75, DialogResult = DialogResult.OK };
             var cancel = new Button { Text = "Annulla", Left = 353, Top = 356, Width = 75, DialogResult = DialogResult.Cancel };

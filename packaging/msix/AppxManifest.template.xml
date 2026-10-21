@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Modello del manifest MSIX. I segnaposto {{...}} li sostituisce build-msix.ps1.
+  Identity Name e Publisher DEVONO coincidere con quelli di Partner Center (Product management > Product identity).
+-->
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
+  IgnorableNamespaces="uap rescap desktop">
+
+  <Identity Name="{{IDENTITY_NAME}}" Publisher="{{PUBLISHER}}" Version="{{VERSION}}" ProcessorArchitecture="x64" />
+
+  <Properties>
+    <DisplayName>PiCoShot</DisplayName>
+    <PublisherDisplayName>{{PUBLISHER_DISPLAY_NAME}}</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+  </Properties>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.18362.0" MaxVersionTested="10.0.26100.0" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="it-IT" />
+  </Resources>
+
+  <Applications>
+    <Application Id="PiCoShot" Executable="PiCoShot.exe" EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements
+        DisplayName="PiCoShot"
+        Description="Cattura schermo portable con annotazioni e OCR offline"
+        BackgroundColor="transparent"
+        Square150x150Logo="Assets\Square150x150Logo.png"
+        Square44x44Logo="Assets\Square44x44Logo.png">
+        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" Square71x71Logo="Assets\Square71x71Logo.png" Square310x310Logo="Assets\Square310x310Logo.png" />
+      </uap:VisualElements>
+      <Extensions>
+        <!-- Avvio con Windows: disattivato di default; lo attiva l'utente dall'app (Startup.cs usa l'API StartupTask) -->
+        <desktop:Extension Category="windows.startupTask" Executable="PiCoShot.exe" EntryPoint="Windows.FullTrustApplication">
+          <desktop:StartupTask TaskId="PiCoShotStartup" Enabled="false" DisplayName="PiCoShot" />
+        </desktop:Extension>
+      </Extensions>
+    </Application>
+  </Applications>
+
+  <Capabilities>
+    <!-- App desktop Win32/.NET Framework: serve full trust per hotkey globali, cattura dello schermo e icona nella tray -->
+    <rescap:Capability Name="runFullTrust" />
+  </Capabilities>
+</Package>

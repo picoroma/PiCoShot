@@ -62,7 +62,8 @@ namespace PiCoShot
             RegisterHotkeys();
 
             // avvio con Windows: solo se l'utente lo ha attivato (l'ini lo ricorda; qui si aggiorna il percorso dell'exe)
-            if (Settings.AutoStart) Startup.Set(true);
+            // (nel pacchetto MSIX lo stato lo gestisce Windows: non si forza a ogni avvio)
+            if (Settings.AutoStart && !Startup.IsPackaged) Startup.Set(true);
             _autoItem.Checked = Startup.IsEnabled;
         }
 
@@ -76,7 +77,7 @@ namespace PiCoShot
             }
             else
             {
-                _tray.ShowBalloonTip(5000, "PiCoShot", "Impossibile modificare l'avvio con Windows (registro non scrivibile).", ToolTipIcon.Warning);
+                _tray.ShowBalloonTip(6000, "PiCoShot", Startup.LastError ?? "Impossibile modificare l'avvio con Windows.", ToolTipIcon.Warning);
             }
             _autoItem.Checked = Startup.IsEnabled;
         }
@@ -183,7 +184,7 @@ namespace PiCoShot
                 if (dlg.AutoStart != Startup.IsEnabled || dlg.AutoStart != Settings.AutoStart)
                 {
                     if (Startup.Set(dlg.AutoStart)) Settings.AutoStart = dlg.AutoStart;
-                    else problems.AppendLine("Impossibile modificare l'avvio con Windows (registro non scrivibile).");
+                    else problems.AppendLine(Startup.LastError ?? "Impossibile modificare l'avvio con Windows.");
                 }
                 _autoItem.Checked = Startup.IsEnabled;
                 Settings.Save();
