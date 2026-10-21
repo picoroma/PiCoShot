@@ -4,3 +4,6 @@ obj/
 *.user
 *.log
 dist/
+
+# originali privati (contenuto di terzi: non versionare)
+src/PiCoShot/Resources/Source.jpg
