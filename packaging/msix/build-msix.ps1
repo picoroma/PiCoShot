@@ -9,9 +9,10 @@
     .\packaging\msix\build-msix.ps1 -IdentityName "12345Nome.PiCoShot" -Publisher "CN=AAAA-BBBB-..." -PublisherDisplayName "Il Tuo Nome"
 #>
 param(
-    [string]$IdentityName = 'PiCoShot.Test',
-    [string]$Publisher = 'CN=PiCoShot Test',
-    [string]$PublisherDisplayName = 'PiCoShot Test',
+    # valori di Partner Center (Product management > Product identity); per prove con altre identità usa i parametri
+    [string]$IdentityName = 'PiCoDev.PiCoShot',
+    [string]$Publisher = 'CN=47CF9EDF-34F1-4B44-8BB0-606DED1FE4C3',
+    [string]$PublisherDisplayName = 'PiCoDev',
     [string]$Version,                       # 4 numeri, l'ultimo 0 (riservato allo Store); predefinito: da AssemblyInfo.cs
     [string]$ExePath,
     [string]$OutDir,
