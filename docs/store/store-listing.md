@@ -44,10 +44,10 @@ Premi la scorciatoia (Stamp di default), trascina per scegliere l'area e fai que
 **Privacy**
 Nessuna connessione a internet, nessun account, nessuna pubblicità, nessuna telemetria. Tutto resta sul tuo dispositivo.
 
-### Novità di questa versione (0.2.0)
-• Pulsante ✔ per eseguire in un clic l'azione predefinita (copia, salva, OCR su file) e ✖ per annullare.
-• Strumenti di annotazione in colonna a lato della selezione.
-• OCR accodato a un file di testo.
+### Novità di questa versione (0.3.0)
+• Interfaccia in italiano e inglese: segue la lingua di Windows, oppure si sceglie dalle Impostazioni.
+• Nuove icona e immagine nella finestra Informazioni.
+• Correzioni nelle Impostazioni.
 
 ### Parole chiave (max 7)
 screenshot, cattura schermo, ocr, annota, appunti, schermata, testo da immagine
@@ -77,10 +77,10 @@ Press the shortcut (Print Screen by default), drag to choose the area and do wha
 **Privacy**
 No internet connection, no account, no ads, no telemetry. Everything stays on your device.
 
-### What's new (0.2.0)
-• ✔ button runs your default action (copy, save, OCR to file) in one click; ✖ cancels.
-• Annotation tools in a column beside the selection.
-• OCR text appended to a text file.
+### What's new (0.3.0)
+• Interface in Italian and English: follows the Windows language, or choose it in Settings.
+• New icon and image in the About window.
+• Fixes in Settings.
 
 ### Search terms (max 7)
 screenshot, screen capture, ocr, annotate, clipboard, snip, text from image
