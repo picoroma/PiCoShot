@@ -44,10 +44,10 @@ Premi la scorciatoia (Stamp di default), trascina per scegliere l'area e fai que
 **Privacy**
 Nessuna connessione a internet, nessun account, nessuna pubblicità, nessuna telemetria. Tutto resta sul tuo dispositivo.
 
-### Novità di questa versione (0.3.0)
+### Novità di questa versione (0.3.1)
+• Nuovi pulsanti Annulla e Ripeti per le annotazioni (anche con Ctrl+Z e Ctrl+Y).
 • Interfaccia in italiano e inglese: segue la lingua di Windows, oppure si sceglie dalle Impostazioni.
 • Nuove icona e immagine nella finestra Informazioni.
-• Correzioni nelle Impostazioni.
 
 ### Parole chiave (max 7)
 screenshot, cattura schermo, ocr, annota, appunti, schermata, testo da immagine
@@ -77,10 +77,10 @@ Press the shortcut (Print Screen by default), drag to choose the area and do wha
 **Privacy**
 No internet connection, no account, no ads, no telemetry. Everything stays on your device.
 
-### What's new (0.3.0)
+### What's new (0.3.1)
+• New Undo and Redo buttons for annotations (also Ctrl+Z and Ctrl+Y).
 • Interface in Italian and English: follows the Windows language, or choose it in Settings.
 • New icon and image in the About window.
-• Fixes in Settings.
 
 ### Search terms (max 7)
 screenshot, screen capture, ocr, annotate, clipboard, snip, text from image

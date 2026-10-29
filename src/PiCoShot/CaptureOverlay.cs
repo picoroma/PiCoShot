@@ -50,6 +50,7 @@ namespace PiCoShot
         private int _textSize = 1;                 // indice in TextSizes
         private bool _bold, _italic, _boxed;       // stile del testo
         private readonly List<Annotation> _annotations = new List<Annotation>();
+        private readonly List<Annotation> _redo = new List<Annotation>();    // annotazioni annullate, ripristinabili con Ripeti
         private Annotation _current;               // annotazione in corso di disegno
         private TextBox _textBox;                  // editor del testo, presente solo durante l'inserimento
         private Point _textDragFrom, _textBoxFrom; // trascinamento del riquadro di testo (mouse e posizione iniziali)
@@ -158,6 +159,7 @@ namespace PiCoShot
         private void ResetAnnotations()
         {
             _annotations.Clear();
+            _redo.Clear();
             _current = null;
             _tool = Tool.None;
         }
@@ -239,6 +241,13 @@ namespace PiCoShot
             _toolbar.AddIcon(ToolIcons.Label, L.T("Etichetta: testo su sfondo colorato", "Label: text on a colored background"), () => { _boxed = !_boxed; RefreshTools(); }, () => _boxed, 28).VisibleWhen = textOn;
             _toolbar.AddSeparator();
 
+            // annulla / ripeti le annotazioni (grigi se non c'è nulla da annullare o ripetere)
+            _toolbar.AddIcon(ToolIcons.Undo, L.T("Annulla ultima modifica (Ctrl+Z)", "Undo last change (Ctrl+Z)"), Undo, null, 30)
+                .EnabledWhen = () => _annotations.Count > 0;
+            _toolbar.AddIcon(ToolIcons.Redo, L.T("Ripeti (Ctrl+Y)", "Redo (Ctrl+Y)"), Redo, null, 30)
+                .EnabledWhen = () => _redo.Count > 0;
+            _toolbar.AddSeparator();
+
             // azioni singole; quelle predefinite hanno il contrassegno verde
             _toolbar.AddIcon(ToolIcons.Copy, L.T("Copia (Ctrl+C)", "Copy (Ctrl+C)"), CopySelection).Badge = () => IsDefault(DefaultAction.Copy);
             _toolbar.AddIcon(ToolIcons.Ocr, L.T("Copia testo - OCR (Ctrl+T)", "Copy text - OCR (Ctrl+T)"), CopyText, null, 38).Badge = () => IsDefault(DefaultAction.Ocr);
@@ -250,7 +259,7 @@ namespace PiCoShot
             // OK = azione predefinita, Annulla = chiude senza fare nulla
             var ok = _toolbar.AddIcon(ToolIcons.Ok, null, RunDefaultActions, null, 40);
             ok.TooltipFunc = () => L.T("OK (Invio): ", "OK (Enter): ") + DefaultActionsText();
-            _toolbar.AddIcon(ToolIcons.Cancel, L.T("Annulla tutto (Esc)", "Cancel everything (Esc)"), CloseOverlay, null, 40);
+            _toolbar.AddIcon(ToolIcons.Cancel, L.T("Esci senza eseguire (Esc)", "Exit without doing anything (Esc)"), CloseOverlay, null, 40);
         }
 
         private static bool IsDefault(DefaultAction a)
@@ -391,8 +400,7 @@ namespace PiCoShot
             DiscardText();
             if (a != null)
             {
-                _annotations.Add(a);
-                Invalidate(a.Bounds);
+                AddAnnotation(a);
             }
             Focus();
         }
@@ -407,12 +415,35 @@ namespace PiCoShot
             if (Visible) Invalidate(Rectangle.Inflate(r, 2, 2));
         }
 
+        /// <summary>Aggiunge un'annotazione: una nuova modifica azzera le annotazioni "da ripetere".</summary>
+        private void AddAnnotation(Annotation a)
+        {
+            _annotations.Add(a);
+            _redo.Clear();
+            Invalidate(a.Bounds);
+            RefreshTools();   // aggiorna lo stato dei pulsanti Annulla / Ripeti
+        }
+
+        /// <summary>Annulla l'ultima annotazione (resta disponibile per Ripeti).</summary>
         private void Undo()
         {
             if (_annotations.Count == 0) return;
             Annotation last = _annotations[_annotations.Count - 1];
             _annotations.RemoveAt(_annotations.Count - 1);
+            _redo.Add(last);
             Invalidate(last.Bounds);
+            RefreshTools();
+        }
+
+        /// <summary>Ripristina l'ultima annotazione annullata.</summary>
+        private void Redo()
+        {
+            if (_redo.Count == 0) return;
+            Annotation a = _redo[_redo.Count - 1];
+            _redo.RemoveAt(_redo.Count - 1);
+            _annotations.Add(a);
+            Invalidate(a.Bounds);
+            RefreshTools();
         }
 
         /// <summary>Area dello schermo che contiene la selezione, in coordinate client (l'overlay copre anche la taskbar).</summary>
@@ -732,6 +763,10 @@ namespace PiCoShot
                 case Keys.Control | Keys.Z:
                     Undo();
                     return true;
+                case Keys.Control | Keys.Y:
+                case Keys.Control | Keys.Shift | Keys.Z:
+                    Redo();
+                    return true;
                 case Keys.Escape:
                 case Keys.Control | Keys.X:
                     CloseOverlay();
@@ -888,7 +923,7 @@ namespace PiCoShot
                 {
                     _current.Update(ClampToSel(e.Location), (ModifierKeys & Keys.Shift) == Keys.Shift);
                     Invalidate(_current.Bounds);
-                    if (_current.IsMeaningful) _annotations.Add(_current);
+                    if (_current.IsMeaningful) AddAnnotation(_current);
                     _current = null;
                 }
                 _drag = Drag.None;

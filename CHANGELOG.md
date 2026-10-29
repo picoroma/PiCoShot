@@ -1,5 +1,12 @@
 # Change log
 
+## 0.3.1
+
+### Novità
+- **Pulsanti Annulla e Ripeti** nella barra (frecce ↩ ↪, accanto alle azioni). Tolgono e rimettono le annotazioni una alla volta; sono grigi quando non c'è nulla da annullare o ripetere. Scorciatoie: `Ctrl+Z` per annullare, `Ctrl+Y` o `Ctrl+Maiusc+Z` per ripetere. Una nuova annotazione dopo un annullamento azzera "Ripeti".
+- Il suggerimento del ✖ diventa **«Esci senza eseguire (Esc)»**, per non confonderlo con l'annullamento delle modifiche.
+- Copia, salva, OCR e stampa non si possono annullare: escono dall'app (file, appunti, stampante).
+
 ## 0.3.0
 
 ### Novità

@@ -24,6 +24,8 @@ namespace PiCoShot
             public float? LineWidth;          // se presente: disegna una linea di questo spessore
             public Action<Graphics, Rectangle> Icon;   // icona vettoriale disegnata al posto del testo
             public bool Separator;
+            public Func<bool> EnabledWhen;    // se presente: il pulsante è grigio e inattivo quando è falso
+            public bool IsEnabled { get { return EnabledWhen == null || EnabledWhen(); } }
             public Func<bool> VisibleWhen;    // se presente: il pulsante c'è solo quando è vero
             public bool Shown { get { return VisibleWhen == null || VisibleWhen(); } }
             public Rectangle Bounds;
@@ -198,7 +200,7 @@ namespace PiCoShot
         {
             if (!Contains(p)) return false;
             int h = HitTest(p);
-            if (h >= 0 && _buttons[h].Action != null) _buttons[h].Action();
+            if (h >= 0 && _buttons[h].Action != null && _buttons[h].IsEnabled) _buttons[h].Action();
             return true;
         }
 
@@ -237,7 +239,7 @@ namespace PiCoShot
 
                 bool on = b.IsChecked != null && b.IsChecked();
                 bool badge = b.Badge != null && b.Badge();
-                if (i == _hover || on)
+                if ((i == _hover && b.IsEnabled) || on)
                     using (var path = RoundRect(b.Bounds, 4))
                     using (var hl = new SolidBrush(i == _hover ? Color.FromArgb(0, 120, 215) : Color.FromArgb(85, 85, 85)))
                         g.FillPath(hl, path);
@@ -258,6 +260,9 @@ namespace PiCoShot
                 else if (b.Icon != null)
                 {
                     b.Icon(g, b.Bounds);
+                    if (!b.IsEnabled)
+                        using (var dim = new SolidBrush(Color.FromArgb(150, 32, 32, 32)))
+                            g.FillRectangle(dim, b.Bounds);   // pulsante inattivo: icona attenuata
                 }
                 else
                 {

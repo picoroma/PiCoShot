@@ -106,6 +106,32 @@ namespace PiCoShot
                     TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
         }
 
+        /// <summary>Annulla: freccia a "U" che torna indietro (↩).</summary>
+        public static void Undo(Graphics g, Rectangle r) { UTurn(g, r, false); }
+
+        /// <summary>Ripeti: la stessa freccia specchiata (↪).</summary>
+        public static void Redo(Graphics g, Rectangle r) { UTurn(g, r, true); }
+
+        private static void UTurn(Graphics g, Rectangle r, bool mirror)
+        {
+            Rectangle b = Box(r);
+            GraphicsState st = g.Save();
+            if (mirror)
+            {
+                g.TranslateTransform(2 * b.Left + b.Width, 0);
+                g.ScaleTransform(-1, 1);
+            }
+            int ty = b.Top + 5, by = ty + 10;
+            using (Pen p = P(2f))
+            {
+                g.DrawLine(p, b.Left + 3, ty, b.Right - 7, ty);
+                g.DrawArc(p, b.Right - 12, ty, 10, 10, -90, 180);
+                g.DrawLine(p, b.Right - 7, by, b.Left + 6, by);
+                g.DrawLines(p, new[] { new Point(b.Left + 8, ty - 4), new Point(b.Left + 3, ty), new Point(b.Left + 8, ty + 4) });
+            }
+            g.Restore(st);
+        }
+
         public static void Copy(Graphics g, Rectangle r)
         {
             Rectangle b = Box(r);
